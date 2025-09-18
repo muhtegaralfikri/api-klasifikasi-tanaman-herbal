@@ -6,14 +6,14 @@ from PIL import Image
 
 app = Flask(__name__)
 
-CORS(app, resources={r"/predict": {"origins": "http://localhost:3000"}})
+# 1. CORS diubah agar bisa diakses dari mana saja
+CORS(app)
 
 try:
     model = joblib.load('model_multiclass.pkl')
     print("Model klasifikasi berhasil dimuat.")
 except FileNotFoundError:
     print("CRITICAL ERROR: File 'model_multiclass.pkl' tidak ditemukan!")
-    print("Pastikan Anda sudah melatih modelnya terlebih dahulu.")
     model = None
 
 def extract_features(image_file):
@@ -37,9 +37,7 @@ def predict():
     
     try:
         fitur_gambar = extract_features(file)
-
         prediksi = model.predict([fitur_gambar])
-        
         nama_tanaman = prediksi[0]
         
         return jsonify({
@@ -49,5 +47,6 @@ def predict():
     except Exception as e:
         return jsonify({"error": f"Gagal memproses gambar: {str(e)}"}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+# 2. Bagian server development dihapus karena tidak dibutuhkan di Render
+# if __name__ == '__main__':
+#     app.run(debug=True, port=5000)
